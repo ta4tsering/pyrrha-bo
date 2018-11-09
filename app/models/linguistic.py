@@ -4,6 +4,7 @@ import io
 import unidecode
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import backref
+from sqlalchemy import func
 from werkzeug.exceptions import BadRequest
 
 from app.models.user import User
@@ -228,9 +229,13 @@ class AllowedLemma(db.Model):
         :param corpus_id: Id of the corpus
         :param _commit: Force commit (Default: false)
         """
-        for item in allowed_values:
-            current = AllowedLemma(label=item, corpus=corpus_id, label_uniform=unidecode.unidecode(item))
-            db.session.add(current)
+        db.session.bulk_insert_mappings(
+            AllowedLemma,
+            [
+                dict(label=item, corpus=corpus_id, label_uniform=unidecode.unidecode(item))
+                for item in allowed_values
+            ]
+        )
         if _commit:
             db.session.commit()
 
@@ -271,9 +276,13 @@ class AllowedPOS(db.Model):
         :param corpus_id: Id of the corpus
         :param _commit: Force commit (Default: false)
         """
-        for item in allowed_values:
-            current = AllowedPOS(label=item, corpus=corpus_id)
-            db.session.add(current)
+        db.session.bulk_insert_mappings(
+            AllowedPOS,
+            [
+                dict(label=item, corpus=corpus_id)
+                for item in allowed_values
+            ]
+        )
         if _commit:
             db.session.commit()
 
@@ -316,13 +325,17 @@ class AllowedMorph(db.Model):
         :param corpus_id: Id of the corpus
         :param _commit: Force commit (Default: false)
         """
-        for item in allowed_values:
-            current = AllowedMorph(
-                label=item.get("label"),
-                readable=item.get("readable", item["label"]),
-                corpus=corpus_id
-            )
-            db.session.add(current)
+        db.session.bulk_insert_mappings(
+            AllowedMorph,
+            [
+                dict(
+                    label=item.get("label"),
+                    readable=item.get("readable", item["label"]),
+                    corpus=corpus_id
+                )
+                for item in allowed_values
+            ]
+        )
         if _commit:
             db.session.commit()
 
@@ -381,6 +394,8 @@ class WordToken(db.Model):
     morph = db.Column(db.String(64))
     left_context = db.Column(db.String(512))
     right_context = db.Column(db.String(512))
+
+    _changes = db.relationship("ChangeRecord")
 
     CONTEXT_LEFT = 3
     CONTEXT_RIGHT = 3
@@ -578,6 +593,10 @@ class WordToken(db.Model):
         :type corpus_id: int
         :param word_tokens_dict: Generator made of dicts of tokens with form, lemma, POS and morph key
         :type word_tokens_dict: list of dict
+        :param context_left: Length of the context to keep on the left
+        :type context_left: int
+        :param context_right: Length of the context to keep on the right
+        :type context_right: int
         """
         if context_right:
             context_right = int(context_right)
@@ -591,6 +610,7 @@ class WordToken(db.Model):
 
         word_tokens_dict = list(word_tokens_dict)
         count_tokens = len(word_tokens_dict)
+        tokens = []
         for i, token in enumerate(word_tokens_dict):
 
             if i == 0:
@@ -607,7 +627,7 @@ class WordToken(db.Model):
             else:
                 next_token = [tok.get("form", tok.get("tokens")) for tok in word_tokens_dict[i+1:i+context_right+1]]
 
-            wt = WordToken(
+            wt = dict(
                 form=token.get("form", token.get("tokens")),
                 lemma=token.get("lemma", token.get("lemmas")),
                 label_uniform=unidecode.unidecode(token.get("lemma", token.get("lemmas"))),
@@ -619,7 +639,9 @@ class WordToken(db.Model):
                 corpus=corpus_id,
                 order_id=i
             )
-            db.session.add(wt)
+            tokens.append(wt)
+
+        db.session.bulk_insert_mappings(WordToken, tokens)
         db.session.commit()
 
     @staticmethod
@@ -756,45 +778,48 @@ class WordToken(db.Model):
             raise BadRequest(description="Mode is not from the list partial, complete, "
                                          "lemma, POS, morph, lemma_ex, morph_ex, POS_ex")
         elif mode == "partial":
-            filtering = db.or_(
-                    db.and_(WordToken.form == token.form, WordToken.lemma == token.lemma),
-                    db.and_(WordToken.form == token.form, WordToken.POS == token.POS),
-                    db.and_(WordToken.form == token.form, WordToken.morph == token.morph),
+            filtering = (
+                WordToken.form == token.form,
+                db.or_(
+                    WordToken.lemma == token.lemma,
+                    WordToken.POS == token.POS,
+                    WordToken.morph == token.morph,
                 )
+            )
         elif mode == "complete":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.lemma == token.lemma,
                     WordToken.POS == token.POS,
                     WordToken.morph == token.morph
                 )
         elif mode == "lemma":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.lemma == token.lemma,
                 )
         elif mode == "lemma_ex":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.lemma != token.lemma,
                 )
         elif mode == "POS":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.POS == token.POS,
                 )
         elif mode == "POS_ex":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.POS != token.POS,
                 )
         elif mode == "morph":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.morph == token.morph,
                 )
         elif mode == "morph_ex":
-            filtering = db.and_(
+            filtering = (
                     WordToken.form == token.form,
                     WordToken.morph != token.morph,
                 )
@@ -802,7 +827,7 @@ class WordToken(db.Model):
                 db.and_(
                     WordToken.corpus == token.corpus,
                     WordToken.id != token.id,
-                    filtering
+                    *filtering
                 )
             )
 
