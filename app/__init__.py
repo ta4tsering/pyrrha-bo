@@ -20,22 +20,25 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'account.login'
 
+
 def create_app(config_name="dev"):
     """ Create the application """
+    if not isinstance(config_name, str):
+        configuration = config_name
+    else:
+        configuration = config[config_name]
+
     app = Flask(
         __name__,
-        template_folder=config[config_name].template_folder,
-        static_folder=config[config_name].static_folder,
+        template_folder=configuration.template_folder,
+        static_folder=configuration.static_folder,
         static_url_path="/statics"
     )
-    if not isinstance(config_name, str):
-        app.config.from_object(config)
-    else:
-        app.config.from_object(config[config_name])
+    app.config.from_object(configuration)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    config[config_name].init_app(app)
+    configuration.init_app(app)
 
     # Set up extensions
     mail.init_app(app)
@@ -54,8 +57,5 @@ def create_app(config_name="dev"):
 
     from .admin import admin as admin_blueprint
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
-
-    from .configurations import configuration as configurations_blueprint
-    app.register_blueprint(configurations_blueprint)
 
     return app

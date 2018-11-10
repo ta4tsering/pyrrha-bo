@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+benchmark_sql.py
+benchmark.tsv
 *$py.class
 
 # SQLITE
