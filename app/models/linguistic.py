@@ -434,6 +434,7 @@ class WordToken(db.Model):
         """
         return "\t".join([self.form, self.lemma, self.POS or "_", self.morph or "_"])
 
+    @property
     def changed(self):
         """ Tells whether this token has already been edited
 
@@ -446,8 +447,23 @@ class WordToken(db.Model):
             )
         ).exists()).scalar()
 
+    @classmethod
+    def similar_as(cls, corpus: int, form: str, lemma: str, POS: str, morph: str):
+        cnt, *_ = db.session.query(func.count(1)).filter(
+            db.and_(
+                WordToken.corpus == corpus,
+                WordToken.form == form,
+                db.or_(
+                    WordToken.lemma == lemma,
+                    WordToken.POS == POS,
+                    WordToken.morph == morph,
+                )
+            )
+        ).first()
+        return cnt - 1
+
     @property
-    def similar(self):
+    def similar_(self):
         """ Number of partial match this token has
 
         :return: Number of partial match this token has

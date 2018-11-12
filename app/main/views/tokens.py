@@ -2,6 +2,7 @@ import pprint
 from flask import request, jsonify, url_for, abort
 from flask_login import current_user, login_required
 from sqlalchemy.sql.elements import or_, and_
+from collections import defaultdict
 
 from .utils import render_template_with_nav_info, request_wants_json
 from .. import main
@@ -23,6 +24,15 @@ def tokens_edit(corpus_id):
     tokens = corpus\
         .get_tokens()\
         .paginate(page=int_or(request.args.get("page"), 1), per_page=int_or(request.args.get("limit"), 100))
+
+    maps = {}
+    for token in tokens.items:
+        key = (token.form, token.lemma, token.POS, token.morph)
+        if key not in maps:
+            maps[key] = \
+                WordToken.similar_as(corpus.id, *key)
+        token.similar = maps[key]
+
     return render_template_with_nav_info('main/tokens_edit.html', corpus=corpus, tokens=tokens)
 
 
