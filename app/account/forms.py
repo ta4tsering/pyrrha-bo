@@ -15,12 +15,12 @@ from app.models import User
 
 class LoginForm(FlaskForm):
     email = EmailField(
-        'Email', validators=[InputRequired(),
+        'ཡིག་ཟམ་ཁ་བྱང་།', validators=[InputRequired(),
                              Length(1, 64),
                              Email()])
-    password = PasswordField('Password', validators=[InputRequired()])
-    remember_me = BooleanField('Keep me logged in')
-    submit = SubmitField('Log in')
+    password = PasswordField('གསང་གྲངས།', validators=[InputRequired()])
+    remember_me = BooleanField('གསང་གྲངས་ཉར།')
+    submit = SubmitField('ཐོ་འཇུག')
 
 
 class RegistrationForm(FlaskForm):

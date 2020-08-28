@@ -157,7 +157,7 @@ class TestUserAccount(TestBase):
         self.logout()
         self.login(foo_email, self.app.config['ADMIN_PASSWORD'] + "new")
         success = self.driver.find_element_by_class_name("alert-success").text
-        self.assertTrue(success == "You are now logged in. Welcome back!")
+        self.assertTrue(success == "ཐོ་འཇུག་བྱས་ཟིན།")
 
     def test_delete_user(self):
         self.addCorpus("wauchier")
@@ -242,7 +242,7 @@ class TestUserAccount(TestBase):
         self.db.session.commit()
         self.login_with_user(foo_email)
         success = self.driver.find_element_by_class_name("alert-success").text
-        self.assertTrue(success == "You are now logged in. Welcome back!")
+        self.assertTrue(success == "ཐོ་འཇུག་བྱས་ཟིན།")
         h3 = self.driver.find_element_by_tag_name("h3").text
         self.assertTrue(h3 == "You need to confirm your account before continuing.")
         # check that you can't nor create corpus nor go to your dashboard while your account is unconfirmed

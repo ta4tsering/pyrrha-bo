@@ -6,13 +6,13 @@
     <div class="container">
         {% if current_user.is_admin() %}
             <div id="admin-dashboard" class="list-group">
-                <h3 class="list-group-item bg-dark text-white">User Dashboard</h3>
-                        {{ dashboard.dashboard_option('Registered Users', 'admin.registered_users',
-                                        description='View and manage user accounts', icon='fa fa-users') }}
-                        {{ dashboard.dashboard_option('Add New User', 'admin.new_user',
-                                        description='Create a new user account', icon='fa fa-user-plus') }}
-                        {{ dashboard.dashboard_option('Invite New User', 'admin.invite_user',
-                                        description='Invites a new user to create their own account',
+                <h3 class="list-group-item bg-dark text-white">བཀོལ་བདག་གྱི་ཚད་ལྡེབས།</h3>
+                        {{ dashboard.dashboard_option('དེབ་བཀོད་བཀོལ་བདག', 'admin.registered_users',
+                                        description='བཀོལ་བདག་གི་ཐོ་གཞུང་ལ་ལྟ་བཤེར་དང་དོ་དམ་བྱེད་པ།', icon='fa fa-users') }}
+                        {{ dashboard.dashboard_option('བཀོལ་བདག་གསར་སྣོན།', 'admin.new_user',
+                                        description='བཀོལ་བདག་གསར་པའི་ཐོ་གཞུང་གསར་བཟོ་བྱེད་པ།', icon='fa fa-user-plus') }}
+                        {{ dashboard.dashboard_option('བཀོལ་བདག་གསར་པ་གདན་འདྲེན།', 'admin.invite_user',
+                                        description='བཀོལ་བདག་གསར་པ་རང་ཉིད་ཀྱིས་ཐོ་གཞུང་གསར་པ་བཟོ་བཅུག་པ།',
                                         icon='fa fa-user-plus') }}
 
             </div>

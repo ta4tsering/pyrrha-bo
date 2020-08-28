@@ -23,7 +23,7 @@
 {% macro header_items(current_user) %}
     {% set user = [] %}
     {% if current_user.is_authenticated %}
-      {% set user = ([('main.dashboard', 'Dashboard', 'fa fa-bars')]) %}
+      {% set user = ([('main.dashboard', 'ཚད་ལྡེབས།', 'fa fa-bars')]) %}
     {% endif %}
     {{ render_menu_items( user ) }}
 {% endmacro %}
@@ -34,14 +34,14 @@
 {% macro account_items(current_user) %}
     {% if current_user.is_authenticated %}
       {% set endpoints = [
-        ('account.manage', 'Your Account', 'fa fa-user-circle'),
-        ('account.logout', 'Log out', 'fa fa-sign-out')
+        ('account.manage', 'ཐོ་གཞུང་།', 'fa fa-user-circle'),
+        ('account.logout', 'ཕྱིར་ཐོན།', 'fa fa-sign-out')
       ] %}
       {{ render_menu_items(endpoints) }}
     {% else %}
       {% set endpoints = [
-        ('account.register', 'Register', 'fa fa-user-plus'),
-        ('account.login', 'Log In', 'fa fa-sign-in')
+        ('account.register', 'ཐོ་འགོད།', 'fa fa-user-plus'),
+        ('account.login', 'ཐོ་འཇུག', 'fa fa-sign-in')
       ] %}
       {{ render_menu_items(endpoints) }}
     {% endif %}
@@ -61,7 +61,7 @@
 
               {% if current_user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" id="new_corpus_link" href="{{url_for("main.corpus_new")}}">New Corpus</a>
+                <a class="nav-link" id="new_corpus_link" href="{{url_for("main.corpus_new")}}">སྐད་མཛོད་གསར་པ།</a>
               </li>
               {% endif %}
               {%- if corpora %}
@@ -86,7 +86,7 @@
                 <a id="toggle_controllists"
                    class="nav-link dropdown-toggle"
                    data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    Control Lists
+                    ཚད་འཛིན་ཐོ་ཁྲ།
                 </a>
                 <div class="dropdown-menu">
                     {% for control_list in control_lists %}
@@ -101,7 +101,7 @@
             </ul>
             <ul class="navbar-nav"> 
                   <li class="nav-item"><a class="nav-link" href="https://github.com/hipster-philology/pyrrha/issues/new/choose" target="_blank"><i class="fa fa-bug"  aria-hidden="true"></i> Bug or request ?</a></li>
-                  <li class="nav-item"><a class="nav-link" href="https://pyrrha.readthedocs.io/en/latest/" target="_blank"><i class="fa fa-question-circle"  aria-hidden="true"></i> Help</a></li>
+                  <li class="nav-item"><a class="nav-link" href="https://pyrrha.readthedocs.io/en/latest/" target="_blank"><i class="fa fa-question-circle"  aria-hidden="true"></i> རོགས་རམ།</a></li>
                 {{ account_items(current_user) }}
             </ul>
           </div>
@@ -137,10 +137,10 @@
             {%- endfor -%}
             <div class="input-group input-group-sm">
               <div class="input-group-prepend">
-                <button class="btn btn-primary" type="submit" id="button-addon1">Go to</button>
+                <button class="btn btn-primary" type="submit" id="button-addon1">འཚོལ།</button>
               </div>
               <input type="number" name="page"
-                     class="form-control" placeholder="Page" aria-label="Example text with button addon"
+                     class="form-control" placeholder="ཤོག་ངོས།" aria-label="Example text with button addon"
                      aria-describedby="button-addon1" aria-placeholder="Page" />
             </div>
         </form>
@@ -204,12 +204,12 @@ Correct tokens with
 
 {% macro corpora_list(corpora, endpoint='', favorites=[]) %}
     <div class="mt-5">
-        <h2>Your corpora</h2>
+        <h2>ཁྱེད་ཀྱི་སྐད་མཛོད།</h2>
 
         {{ render_pagination(corpora, endpoint, get_params=[]) }}
 
         <div id="corpora-dashboard" class="list-group">
-            <h3 class="list-group-item bg-dark text-white">Corpora</h3>
+            <h3 class="list-group-item bg-dark text-white">སྐད་མཛོད་ཁག</h3>
             {% for corpus in corpora.items %}
                 <div  class="list-group-item list-group-item-action">
                     <div class="content container">
